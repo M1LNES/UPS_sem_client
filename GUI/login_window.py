@@ -7,10 +7,11 @@ from tkinter import ttk
 from constants import message_constants
 
 
+
 class LoginWindow:
     def __init__(self, root):
         self.root = root
-        self.root.title("Chat Client")
+        self.root.title("Login Window")
 
         self.server_ip_label = ttk.Label(root, text="Server IP:")
         self.server_ip_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
@@ -42,7 +43,7 @@ class LoginWindow:
         if not (validate.validate_name(nickname) and validate.validate_server_ip(ip) and validate.validate_port(port)):
             return
 
-        message = messageHandler.create_message(self.nickname_entry.get())
+        message = messageHandler.create_nick_message(self.nickname_entry.get())
 
         try:
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,8 +72,9 @@ class LoginWindow:
     def on_double_click(self, event):
         selected_index = self.lobby_listbox.curselection()
         if selected_index:
-            selected_item = self.lobby_listbox.get(selected_index)
-            print(f"Double-clicked on: {selected_item}")
+            lobby_object = self.lobby_listbox.get(selected_index)
+            messageHandler.join_lobby(lobby_object)
+            print(f"Double-clicked on: {lobby_object}")
         else:
             print("No item selected.")
 
@@ -95,8 +97,13 @@ class LoginWindow:
         self.lobby_listbox.delete(0, tk.END)
 
         for lobby in lobbies:
-            lobby_info = f"{lobby['nick']} | Max Players: {lobby['max_players']} | Current Players: {lobby['current_players']} | Status: {'Waiting' if lobby['game_status'] == 1 else 'Started'}"
+            lobby_name = lobby['nick']
+            current_players = lobby['current_players']
+            max_players = lobby['max_players']
+            status = 'Waiting' if lobby['game_status'] == 1 else 'Started'
+            lobby_info = f"{lobby_name} - {current_players}/{max_players} ({status})"
             self.lobby_listbox.insert(tk.END, lobby_info)
+
 
     def handle_message(self, message):
 

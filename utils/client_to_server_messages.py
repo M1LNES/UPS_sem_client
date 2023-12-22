@@ -1,7 +1,7 @@
 from constants import message_constants
 
 
-def create_message(nick):
+def create_nick_message(nick):
     len_nick = str(len(nick)).zfill(3)
     formatted_message = f"{message_constants.MAGIC}{len_nick}{message_constants.NICK_TYPE}{nick}"
     return formatted_message
@@ -55,3 +55,8 @@ def extract_lobbies_info(message):
             lobbies.append(lobby_info)
 
     return lobbies
+
+
+def join_lobby(selected_index):
+    print("Index: ", selected_index)
+    return None
