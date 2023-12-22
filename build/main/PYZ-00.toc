@@ -1,5 +1,8 @@
 ('C:\\Users\\milan\\PycharmProjects\\UPS_client\\build\\main\\PYZ-00.pyz',
  [('GUI', '-', 'PYMODULE'),
+  ('GUI.lobby_window',
+   'C:\\Users\\milan\\PycharmProjects\\UPS_client\\GUI\\lobby_window.py',
+   'PYMODULE'),
   ('GUI.login_window',
    'C:\\Users\\milan\\PycharmProjects\\UPS_client\\GUI\\login_window.py',
    'PYMODULE'),

@@ -57,6 +57,8 @@ def extract_lobbies_info(message):
     return lobbies
 
 
-def join_lobby(selected_index):
-    print("Index: ", selected_index)
-    return None
+def create_lobby_joining_message(lobby_name):
+    len_name = str(len(lobby_name)).zfill(3)
+    formatted_message = f"{message_constants.MAGIC}{len_name}{message_constants.JOIN_TYPE}{lobby_name}"
+    print("FORMAT MESAGE: ", formatted_message)
+    return formatted_message

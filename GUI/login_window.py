@@ -5,7 +5,7 @@ import utils.client_to_server_messages as messageHandler
 import utils.validation as validate
 from tkinter import ttk
 from constants import message_constants
-
+from GUI.lobby_window import LobbyWindow
 
 
 class LoginWindow:
@@ -34,6 +34,7 @@ class LoginWindow:
         self.server = None
         self.response_thread = None
         self.lobby_listbox = None
+        self.lobby_window_initializer = None
 
     def connect_to_server(self):
         ip = self.server_ip_entry.get()
@@ -52,31 +53,17 @@ class LoginWindow:
             self.response_thread = threading.Thread(target=self.handle_server_response)
             self.response_thread.start()
 
-            self.server.sendall((message + "\n").encode())
+            self.open_chat_window(self.server)
 
-            self.open_chat_window()
+            self.server.sendall((message + "\n").encode())
 
             self.root.withdraw()
         except Exception as e:
             print(f"Error connecting: {str(e)}")
 
-    def open_chat_window(self):
-        chat_window = tk.Toplevel()
-        chat_window.title(f"Chat Window - ")
-
-        self.lobby_listbox = tk.Listbox(chat_window)
-        self.lobby_listbox.pack(pady=10, fill="both", expand=True)
-
-        self.lobby_listbox.bind("<Double-Button-1>", self.on_double_click)
-
-    def on_double_click(self, event):
-        selected_index = self.lobby_listbox.curselection()
-        if selected_index:
-            lobby_object = self.lobby_listbox.get(selected_index)
-            messageHandler.join_lobby(lobby_object)
-            print(f"Double-clicked on: {lobby_object}")
-        else:
-            print("No item selected.")
+    def open_chat_window(self,server):
+        self.lobby_window_initializer = LobbyWindow(self.root, server)
+        self.lobby_window_initializer.open_chat_window()
 
     def handle_server_response(self):
         while True:
@@ -93,20 +80,9 @@ class LoginWindow:
                 break
 
     def update_lobby_list(self, lobbies):
-
-        self.lobby_listbox.delete(0, tk.END)
-
-        for lobby in lobbies:
-            lobby_name = lobby['nick']
-            current_players = lobby['current_players']
-            max_players = lobby['max_players']
-            status = 'Waiting' if lobby['game_status'] == 1 else 'Started'
-            lobby_info = f"{lobby_name} - {current_players}/{max_players} ({status})"
-            self.lobby_listbox.insert(tk.END, lobby_info)
-
+        self.lobby_window_initializer.update_lobby_list(lobbies)
 
     def handle_message(self, message):
-
         message_type = message[len(message_constants.MAGIC) + message_constants.MESSAGE_LENGTH_FORMAT:len(
             message_constants.MAGIC) + message_constants.MESSAGE_LENGTH_FORMAT + message_constants.MESSAGE_TYPE_LENGTH]
         message_body = message[len(
@@ -116,6 +92,7 @@ class LoginWindow:
             self.update_lobby_list(lobbies)
 
     def handle_response_from_server(self, response):
+        print("Server response: ", response)
         response = response.replace("\n", "")
         if messageHandler.is_message_valid(response):
             self.handle_message(response)
