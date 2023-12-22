@@ -37,23 +37,14 @@ def is_message_valid(message):
 
 
 def extract_lobbies_info(message):
-    # Split the message into individual lobbies
     lobby_strings = message.split(';')
-
-    # Initialize a list to store lobby information
     lobbies = []
 
-    # Process each lobby string
     for lobby_string in lobby_strings:
-        # Split the lobby string into its components
         lobby_components = lobby_string.split('|')
-
-        # Ensure that the lobby string has the expected structure
         if len(lobby_components) == 4:
-            # Extract individual components
             nick, max_players, current_players, game_status = lobby_components
 
-            # Create a dictionary to represent the lobby
             lobby_info = {
                 'nick': nick,
                 'max_players': int(max_players),
@@ -61,7 +52,6 @@ def extract_lobbies_info(message):
                 'game_status': int(game_status),
             }
 
-            # Append the lobby information to the list
             lobbies.append(lobby_info)
 
     return lobbies
