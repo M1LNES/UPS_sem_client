@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+from utils.client_to_server_messages import create_start_game_message
+
 
 class GameWindow:
     def __init__(self, parent, server):
@@ -9,6 +11,9 @@ class GameWindow:
         self._can_be_started = False  # Use a private attribute with a leading underscore
         self._current_players = 0
         self._max_players = 0
+        self.nicknames = []
+        self.unique_characters = ""
+        self.masked_sentence = ""
 
     @property
     def can_be_started(self):
@@ -52,10 +57,16 @@ class GameWindow:
         self.current_players_label = ttk.Label(self.game_window, text="Current Players:")
         self.current_players_label.grid(row=2, column=0, pady=5)
 
-        self.refresh_gui()
+        self.nicknames_label = ttk.Label(self.game_window, text="Nicknames:")
+        self.nicknames_label.grid(row=5, column=0, pady=5)
 
-    def start_game(self):
-        self.can_be_started = not self.can_be_started
+        self.unique_characters_label = ttk.Label(self.game_window, text="Unique Characters:")
+        self.unique_characters_label.grid(row=3, column=0, pady=5)
+
+        self.masked_sentence_label = ttk.Label(self.game_window, text="Masked Sentence:")
+        self.masked_sentence_label.grid(row=4, column=0, pady=5)
+
+        self.refresh_gui()
 
     def refresh_gui(self):
         if self.can_be_started:
@@ -64,5 +75,27 @@ class GameWindow:
             self.start_button.grid_forget()
         players_info = f"{self._current_players}/{self._max_players}"
         self.current_players_label.config(text=f"Current Players: {players_info}")
+
+        nicknames_str = ", ".join(self.nicknames)
+        self.nicknames_label.config(text=f"Nicknames: {nicknames_str}")
+        self.unique_characters_label.config(text=f"Unique Characters: {self.unique_characters}")
+        self.masked_sentence_label.config(text=f"Masked Sentence: {self.masked_sentence}")
+
+
     def start_game(self):
-        self.status_label.config(text="Game is in progress")
+        message = create_start_game_message()
+        self.server.sendall((message + "\n").encode())
+
+    def extract_init_game_info(self, message_body):
+        segments = message_body.split('|')
+
+        if len(segments) == 3:
+            self.nicknames = segments[0].split(';')
+            self.unique_characters = segments[1]
+            self.masked_sentence = segments[2]
+
+            self.refresh_gui()
+
+            # return nicknames, unique_characters, masked_sentence
+        else:
+            return None

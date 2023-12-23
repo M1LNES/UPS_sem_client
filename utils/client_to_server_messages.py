@@ -85,3 +85,7 @@ def extract_players(message_body):
             return None, None
     else:
         return None, None
+
+def create_start_game_message():
+    formatted_message = f"{message_constants.MAGIC}000{message_constants.START_THE_GAME}"
+    return formatted_message
