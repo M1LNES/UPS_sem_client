@@ -97,6 +97,15 @@ class LoginWindow:
                 self.lobby_window_initializer.close_lobby_window()
                 self.game_window_initializer = GameWindow(self.root, self.server)
                 self.game_window_initializer.open_game_window()
+        elif message_type == message_constants.CAN_GAME_START:
+            canBeStarted = messageHandler.can_game_begin(message_body)
+            if canBeStarted:
+                self.game_window_initializer.can_be_started = True
+            else:
+                self.game_window_initializer.can_be_started = False
+
+
+
 
 
 

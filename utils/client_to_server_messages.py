@@ -66,3 +66,7 @@ def create_lobby_joining_message(lobby_name):
 
 def joined_lobby_successfully(message):
     return message == "1"
+
+
+def can_game_begin(message):
+    return message == "1"
