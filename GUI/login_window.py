@@ -99,16 +99,15 @@ class LoginWindow:
                 self.game_window_initializer.open_game_window()
         elif message_type == message_constants.CAN_GAME_START:
             canBeStarted = messageHandler.can_game_begin(message_body)
+            current_players, max_players = messageHandler.extract_players(message_body)
+
+            self.game_window_initializer.current_players = current_players
+            self.game_window_initializer.max_players = max_players
+
             if canBeStarted:
                 self.game_window_initializer.can_be_started = True
             else:
                 self.game_window_initializer.can_be_started = False
-
-
-
-
-
-
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)

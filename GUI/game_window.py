@@ -7,6 +7,8 @@ class GameWindow:
         self.game_window = None
         self.server = server
         self._can_be_started = False  # Use a private attribute with a leading underscore
+        self._current_players = 0
+        self._max_players = 0
 
     @property
     def can_be_started(self):
@@ -15,8 +17,27 @@ class GameWindow:
     @can_be_started.setter
     def can_be_started(self, value):
         if self._can_be_started != value:
-            print(f"can_be_started changed: {self._can_be_started} -> {value}")
             self._can_be_started = value
+            self.refresh_gui()
+
+    @property
+    def current_players(self):
+        return self._current_players
+
+    @current_players.setter
+    def current_players(self, value):
+        if self._current_players != value:
+            self._current_players = value
+            self.refresh_gui()
+
+    @property
+    def max_players(self):
+        return self._max_players
+
+    @max_players.setter
+    def max_players(self, value):
+        if self._max_players != value:
+            self._max_players = value
             self.refresh_gui()
 
     def open_game_window(self):
@@ -28,6 +49,9 @@ class GameWindow:
 
         self.start_button = ttk.Button(self.game_window, text="Start the game", command=self.start_game)
 
+        self.current_players_label = ttk.Label(self.game_window, text="Current Players:")
+        self.current_players_label.grid(row=2, column=0, pady=5)
+
         self.refresh_gui()
 
     def start_game(self):
@@ -38,5 +62,7 @@ class GameWindow:
             self.start_button.grid(row=1, column=0, pady=10)
         else:
             self.start_button.grid_forget()
+        players_info = f"{self._current_players}/{self._max_players}"
+        self.current_players_label.config(text=f"Current Players: {players_info}")
     def start_game(self):
         self.status_label.config(text="Game is in progress")

@@ -69,4 +69,19 @@ def joined_lobby_successfully(message):
 
 
 def can_game_begin(message):
-    return message == "1"
+    print("Zprava: ", message)
+    return message[0] == "1"
+
+
+def extract_players(message_body):
+    parts = message_body.split('|')
+
+    if len(parts) == 3:
+        try:
+            current_players = int(parts[1])
+            max_players = int(parts[2])
+            return current_players, max_players
+        except ValueError:
+            return None, None
+    else:
+        return None, None
