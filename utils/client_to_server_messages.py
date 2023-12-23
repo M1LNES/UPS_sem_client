@@ -62,3 +62,7 @@ def create_lobby_joining_message(lobby_name):
     formatted_message = f"{message_constants.MAGIC}{len_name}{message_constants.JOIN_TYPE}{lobby_name}"
     print("FORMAT MESAGE: ", formatted_message)
     return formatted_message
+
+
+def joined_lobby_successfully(message):
+    return message == "1"

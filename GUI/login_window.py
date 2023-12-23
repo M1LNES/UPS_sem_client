@@ -1,11 +1,11 @@
 import socket
 import threading
-import tkinter as tk
 import utils.client_to_server_messages as messageHandler
 import utils.validation as validate
 from tkinter import ttk
 from constants import message_constants
 from GUI.lobby_window import LobbyWindow
+from GUI.game_window import GameWindow
 
 
 class LoginWindow:
@@ -35,6 +35,7 @@ class LoginWindow:
         self.response_thread = None
         self.lobby_listbox = None
         self.lobby_window_initializer = None
+        self.game_window_initializer = None
 
     def connect_to_server(self):
         ip = self.server_ip_entry.get()
@@ -61,7 +62,7 @@ class LoginWindow:
         except Exception as e:
             print(f"Error connecting: {str(e)}")
 
-    def open_chat_window(self,server):
+    def open_chat_window(self, server):
         self.lobby_window_initializer = LobbyWindow(self.root, server)
         self.lobby_window_initializer.open_chat_window()
 
@@ -90,6 +91,15 @@ class LoginWindow:
         if message_type == message_constants.LOBBY_INFO_TYPE:
             lobbies = messageHandler.extract_lobbies_info(message_body)
             self.update_lobby_list(lobbies)
+        elif message_type == message_constants.LOBBY_JOIN_RESPONSE:
+            success = messageHandler.joined_lobby_successfully(message_body)
+            if success:
+                self.lobby_window_initializer.close_lobby_window()
+                self.game_window_initializer = GameWindow(self.root, self.server)
+                self.game_window_initializer.open_game_window()
+
+
+
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)

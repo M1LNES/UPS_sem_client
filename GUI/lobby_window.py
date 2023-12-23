@@ -1,17 +1,19 @@
 import tkinter as tk
 from utils.client_to_server_messages import create_lobby_joining_message
 
+
 class LobbyWindow:
     def __init__(self, parent, server):
         self.parent = parent
         self.lobby_listbox = None
         self.server = server
+        self.chat_window = None
 
     def open_chat_window(self):
-        chat_window = tk.Toplevel(self.parent)
-        chat_window.title("Lobby Window")
+        self.chat_window = tk.Toplevel(self.parent)
+        self.chat_window.title("Lobby Window")
 
-        self.lobby_listbox = tk.Listbox(chat_window)
+        self.lobby_listbox = tk.Listbox(self.chat_window)
         self.lobby_listbox.pack(pady=10, fill="both", expand=True)
 
         self.lobby_listbox.bind("<Double-Button-1>", self.on_double_click)
@@ -35,8 +37,9 @@ class LobbyWindow:
             message = create_lobby_joining_message(lobby_name)
             self.server.sendall((message + "\n").encode())
 
-
-
     def extract_lobby_name(self, lobby_info):
         lobby_name = lobby_info.split('-')[0].strip()
         return lobby_name
+
+    def close_lobby_window(self):
+        self.chat_window.withdraw()
