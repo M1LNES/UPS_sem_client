@@ -89,3 +89,8 @@ def extract_players(message_body):
 def create_start_game_message():
     formatted_message = f"{message_constants.MAGIC}000{message_constants.START_THE_GAME}"
     return formatted_message
+
+def create_selected_letter_message(letter):
+    len_nick = str(len(letter)).zfill(3)
+    formatted_message = f"{message_constants.MAGIC}{len_nick}{message_constants.LETTER_SELECTED}{letter}"
+    return formatted_message
