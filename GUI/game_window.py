@@ -14,6 +14,7 @@ class GameWindow:
         self.nicknames = []
         self.unique_characters = ""
         self.masked_sentence = ""
+        self.hint = ""
         self.game_started = False
         self.keyboard_frame = None
 
@@ -84,11 +85,11 @@ class GameWindow:
         self.game_started = True
         segments = message_body.split('|')
 
-        if len(segments) == 3:
+        if len(segments) == 4:
             self.nicknames = segments[0].split(';')
             self.unique_characters = segments[1]
             self.masked_sentence = segments[2]
-
+            self.hint = segments[3]
             self.refresh_gui()
         else:
             return None
@@ -103,6 +104,9 @@ class GameWindow:
         self.masked_sentence_label = ttk.Label(self.game_window, text="Masked Sentence:")
         self.masked_sentence_label.grid(row=4, column=0, pady=5)
 
+        self.hint_label = ttk.Label(self.game_window, text="HINT::")
+        self.hint_label.grid(row=6, column=0, pady=5)
+
         self.start_button.grid_forget()
         players_info = f"{self._current_players}/{self._max_players}"
         self.current_players_label.config(text=f"Current Players: {players_info}")
@@ -111,9 +115,10 @@ class GameWindow:
         self.nicknames_label.config(text=f"Nicknames: {nicknames_str}")
         self.unique_characters_label.config(text=f"Unique Characters: {self.unique_characters}")
         self.masked_sentence_label.config(text=f"Masked Sentence: {self.masked_sentence}")
+        self.hint_label.config(text=f"Hint: {self.hint}")
 
         self.keyboard_frame = ttk.Frame(self.game_window)
-        self.keyboard_frame.grid(row=6, column=0, pady=10)
+        self.keyboard_frame.grid(row=7, column=0, pady=10)
 
         keyboard_layout = [
             'QWERTYUIOP',
