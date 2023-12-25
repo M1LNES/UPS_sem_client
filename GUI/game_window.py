@@ -99,6 +99,7 @@ class GameWindow:
                     self.points[nickname] = int(points_str)
 
             self.unique_characters = segments[1]
+            print("Znaky: ", segments[1])
             self.masked_sentence = segments[2]
             self.hint = segments[3]
             self.refresh_gui()
