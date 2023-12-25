@@ -19,6 +19,8 @@ class GameWindow:
         self.game_started = False
         self.keyboard_frame = None
         self.game_gui_mounted = False
+        self.round_over = False
+        self.buttons = []
 
     @property
     def can_be_started(self):
@@ -120,35 +122,44 @@ class GameWindow:
             self.hint_label = ttk.Label(self.game_window, text="HINT::")
             self.hint_label.grid(row=6, column=0, pady=5)
 
-            self.keyboard_frame = ttk.Frame(self.game_window)
-            self.keyboard_frame.grid(row=7, column=0, pady=10)
-
             self.start_button.grid_forget()
 
             self.game_gui_mounted = True
 
         players_info = f"{self._current_players}/{self._max_players}"
-        self.current_players_label.config(text=f"Current Players: {players_info}")
-
         points_str = ", ".join(f"{nickname}: {self.points[nickname]}" for nickname in self.nicknames)
         self.nicknames_label.config(text=f"Nicknames and Points: {points_str}")
+        self.current_players_label.config(text=f"Current Players: {players_info}")
 
-        self.unique_characters_label.config(text=f"Unique Characters: {self.unique_characters}")
-        self.masked_sentence_label.config(text=f"Masked Sentence: {self.masked_sentence}")
-        self.hint_label.config(text=f"Hint: {self.hint}")
+        if not self.round_over:
+            self.unique_characters_label.config(text=f"Unique Characters: {self.unique_characters}")
+            self.masked_sentence_label.config(text=f"Masked Sentence: {self.masked_sentence}")
+            self.hint_label.config(text=f"Hint: {self.hint}")
 
-        keyboard_layout = [
-            'QWERTYUIOP',
-            'ASDFGHJKL',
-            'ZXCVBNM'
-        ]
+            # Clear existing buttons
+            for button in self.buttons:
+                button.destroy()
 
-        self.buttons = []
+            self.keyboard_frame = ttk.Frame(self.game_window)
+            self.keyboard_frame.grid(row=7, column=0, pady=10)
 
-        for i, row in enumerate(keyboard_layout):
-            for j, key in enumerate(row):
-                button = self.create_button(key, i + 6, j+1)
-                self.buttons.append(button)
+            keyboard_layout = [
+                'QWERTYUIOP',
+                'ASDFGHJKL',
+                'ZXCVBNM'
+            ]
+
+            self.buttons = []
+
+            for i, row in enumerate(keyboard_layout):
+                for j, key in enumerate(row):
+                    button = self.create_button(key, i + 6, j + 1)
+                    self.buttons.append(button)
+        else:
+            self.unique_characters_label.config(text=f"ROUND OVER - sentence guessed")
+            self.masked_sentence_label.config(text=f"Guessed, the sentence was: {self.masked_sentence}")
+            self.hint_label.config(text=f"Hint of the sentence was: {self.hint}")
+            self.round_over = False
 
 
     def create_button(self, key, row, col):
@@ -165,5 +176,31 @@ class GameWindow:
         self.keyboard_frame.grid_forget()
         message = create_selected_letter_message(key)
         self.server.sendall((message + "\n").encode())
+
+    def show_guessed_sentence(self, message_body):
+        print("PRDEL")
+        segments = message_body.split("|")
+
+        if len(segments) == 3:
+            player_info = segments[2].split(";")
+
+            self.nicknames = []
+            self.points = {}
+
+            for player_data in player_info:
+                player_data_parts = player_data.split(':')
+                if len(player_data_parts) == 2:
+                    nickname, points_str = player_data_parts
+                    self.nicknames.append(nickname)
+                    self.points[nickname] = int(points_str)
+
+            self.masked_sentence = segments[1]
+            self.hint = segments[0]
+            self.round_over = True
+            self.refresh_gui()
+
+        else:
+            print("Invalid message format")
+
 
 

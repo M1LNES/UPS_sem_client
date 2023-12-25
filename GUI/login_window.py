@@ -107,6 +107,8 @@ class LoginWindow:
 
         elif message_type == message_constants.GAME_STARTED_INIT:
             self.game_window_initializer.extract_init_game_info(message_body)
+        elif message_type == message_constants.SENTENCE_GUESSED:
+            self.game_window_initializer.show_guessed_sentence(message_body)
     def handle_response_from_server(self, response):
         print("Server response: ", response)
         response = response.replace("\n", "")
