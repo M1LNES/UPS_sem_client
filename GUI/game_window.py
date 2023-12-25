@@ -18,6 +18,7 @@ class GameWindow:
         self.hint = ""
         self.game_started = False
         self.keyboard_frame = None
+        self.game_gui_mounted = False
 
     @property
     def can_be_started(self):
@@ -99,7 +100,6 @@ class GameWindow:
                     self.points[nickname] = int(points_str)
 
             self.unique_characters = segments[1]
-            print("Znaky: ", segments[1])
             self.masked_sentence = segments[2]
             self.hint = segments[3]
             self.refresh_gui()
@@ -107,19 +107,26 @@ class GameWindow:
             return None
 
     def initialize_game(self):
-        self.nicknames_label = ttk.Label(self.game_window, text="Nicknames:")
-        self.nicknames_label.grid(row=5, column=0, pady=5)
+        if not self.game_gui_mounted:
+            self.nicknames_label = ttk.Label(self.game_window, text="Nicknames:")
+            self.nicknames_label.grid(row=5, column=0, pady=5)
 
-        self.unique_characters_label = ttk.Label(self.game_window, text="Unique Characters:")
-        self.unique_characters_label.grid(row=3, column=0, pady=5)
+            self.unique_characters_label = ttk.Label(self.game_window, text="Unique Characters:")
+            self.unique_characters_label.grid(row=3, column=0, pady=5)
 
-        self.masked_sentence_label = ttk.Label(self.game_window, text="Masked Sentence:")
-        self.masked_sentence_label.grid(row=4, column=0, pady=5)
+            self.masked_sentence_label = ttk.Label(self.game_window, text="Masked Sentence:")
+            self.masked_sentence_label.grid(row=4, column=0, pady=5)
 
-        self.hint_label = ttk.Label(self.game_window, text="HINT::")
-        self.hint_label.grid(row=6, column=0, pady=5)
+            self.hint_label = ttk.Label(self.game_window, text="HINT::")
+            self.hint_label.grid(row=6, column=0, pady=5)
 
-        self.start_button.grid_forget()
+            self.keyboard_frame = ttk.Frame(self.game_window)
+            self.keyboard_frame.grid(row=7, column=0, pady=10)
+
+            self.start_button.grid_forget()
+
+            self.game_gui_mounted = True
+
         players_info = f"{self._current_players}/{self._max_players}"
         self.current_players_label.config(text=f"Current Players: {players_info}")
 
@@ -129,9 +136,6 @@ class GameWindow:
         self.unique_characters_label.config(text=f"Unique Characters: {self.unique_characters}")
         self.masked_sentence_label.config(text=f"Masked Sentence: {self.masked_sentence}")
         self.hint_label.config(text=f"Hint: {self.hint}")
-
-        self.keyboard_frame = ttk.Frame(self.game_window)
-        self.keyboard_frame.grid(row=7, column=0, pady=10)
 
         keyboard_layout = [
             'QWERTYUIOP',
@@ -145,6 +149,7 @@ class GameWindow:
             for j, key in enumerate(row):
                 button = self.create_button(key, i + 6, j+1)
                 self.buttons.append(button)
+
 
     def create_button(self, key, row, col):
         button = tk.Button(self.keyboard_frame, text=key, width=5, height=2, command=lambda: self.button_click(key),
