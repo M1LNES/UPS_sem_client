@@ -12,6 +12,7 @@ class GameWindow:
         self._current_players = 0
         self._max_players = 0
         self.nicknames = []
+        self.points = {}
         self.unique_characters = ""
         self.masked_sentence = ""
         self.hint = ""
@@ -86,7 +87,17 @@ class GameWindow:
         segments = message_body.split('|')
 
         if len(segments) == 4:
-            self.nicknames = segments[0].split(';')
+            player_info = segments[0].split(';')
+            self.nicknames = []
+            self.points = {}
+
+            for player_data in player_info:
+                player_data_parts = player_data.split(':')
+                if len(player_data_parts) == 2:
+                    nickname, points_str = player_data_parts
+                    self.nicknames.append(nickname)
+                    self.points[nickname] = int(points_str)
+
             self.unique_characters = segments[1]
             self.masked_sentence = segments[2]
             self.hint = segments[3]
@@ -111,8 +122,9 @@ class GameWindow:
         players_info = f"{self._current_players}/{self._max_players}"
         self.current_players_label.config(text=f"Current Players: {players_info}")
 
-        nicknames_str = ", ".join(self.nicknames)
-        self.nicknames_label.config(text=f"Nicknames: {nicknames_str}")
+        points_str = ", ".join(f"{nickname}: {self.points[nickname]}" for nickname in self.nicknames)
+        self.nicknames_label.config(text=f"Nicknames and Points: {points_str}")
+
         self.unique_characters_label.config(text=f"Unique Characters: {self.unique_characters}")
         self.masked_sentence_label.config(text=f"Masked Sentence: {self.masked_sentence}")
         self.hint_label.config(text=f"Hint: {self.hint}")
