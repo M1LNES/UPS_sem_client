@@ -3,8 +3,9 @@ from tkinter import ttk
 from utils.client_to_server_messages import create_start_game_message
 from utils.client_to_server_messages import create_selected_letter_message
 
+
 class GameWindow:
-    def __init__(self, parent, server):
+    def __init__(self, parent, server, chat_window):
         self.parent = parent
         self.game_window = None
         self.server = server
@@ -21,6 +22,9 @@ class GameWindow:
         self.game_gui_mounted = False
         self.round_over = False
         self.buttons = []
+        self.game_ended = False
+        self.winners = []
+        self.chat_window = chat_window
 
     @property
     def can_be_started(self):
@@ -64,18 +68,18 @@ class GameWindow:
         self.current_players_label = ttk.Label(self.game_window, text="Current Players:")
         self.current_players_label.grid(row=2, column=0, pady=5)
 
-
         self.refresh_gui()
 
     def refresh_gui(self):
-        if self.can_be_started and not self.game_started:
+        if self.game_ended:
+            self.show_final_panel()
+        elif self.can_be_started and not self.game_started:
             self.start_button.grid(row=1, column=0, pady=10)
             self.actualize_current_players_label()
         elif self.game_started:
             self.initialize_game()
         else:
             self.actualize_current_players_label()
-
 
     def actualize_current_players_label(self):
         players_info = f"{self._current_players}/{self._max_players}"
@@ -110,6 +114,8 @@ class GameWindow:
 
     def initialize_game(self):
         if not self.game_gui_mounted:
+            self.status_label.config(text="Game started")
+
             self.nicknames_label = ttk.Label(self.game_window, text="Nicknames:")
             self.nicknames_label.grid(row=5, column=0, pady=5)
 
@@ -161,7 +167,6 @@ class GameWindow:
             self.hint_label.config(text=f"Hint of the sentence was: {self.hint}")
             self.round_over = False
 
-
     def create_button(self, key, row, col):
         button = tk.Button(self.keyboard_frame, text=key, width=5, height=2, command=lambda: self.button_click(key),
                            disabledforeground="red")
@@ -178,7 +183,6 @@ class GameWindow:
         self.server.sendall((message + "\n").encode())
 
     def show_guessed_sentence(self, message_body):
-        print("PRDEL")
         segments = message_body.split("|")
 
         if len(segments) == 3:
@@ -201,6 +205,32 @@ class GameWindow:
 
         else:
             print("Invalid message format")
+
+    def end_the_game(self, message_body):
+        nicknames = message_body.split(";")
+        self.winners = nicknames
+        self.game_ended = True
+        self.refresh_gui()
+
+    def show_final_panel(self):
+        print("JSEM TU")
+        if len(self.winners) > 1:
+            self.unique_characters_label.config(text="WINNERS:" + ";".join(self.winners))
+        else:
+            self.unique_characters_label.config(text="WINNER:" + self.winners[0])
+        self.status_label.config(text="GAME OVER")
+        self.hint_label.config(text="Thanks for playing!")
+        self.masked_sentence_label.config(text="Soon you will be moved back to the main lobby!")
+        self.nicknames_label.config(text="")
+        self.game_window.after(10000, self.close_window)
+        # self.chat_window.deiconify()
+
+
+    def close_window(self):
+        self.game_window.destroy()
+        self.chat_window.deiconify()
+
+
 
 
 
