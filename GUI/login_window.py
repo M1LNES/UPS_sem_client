@@ -36,6 +36,7 @@ class LoginWindow:
         self.lobby_listbox = None
         self.lobby_window_initializer = None
         self.game_window_initializer = None
+        self.buffer = b''
 
     def connect_to_server(self):
         ip = self.server_ip_entry.get()
@@ -69,15 +70,22 @@ class LoginWindow:
     def handle_server_response(self):
         while True:
             try:
-                response = self.server.recv(1024).decode()
-                self.handle_response_from_server(response)
-
-                if not response:
-                    print("Server disconnected.")
+                data = self.server.recv(1024)
+                if not data:
+                    print("Server has disconnected.")
                     break
 
+                self.buffer += data
+
+                messages = self.buffer.split(b'\n')
+                self.buffer = messages.pop()
+
+                for msg in messages:
+                    msg = msg.decode()
+                    self.handle_response_from_server(msg)
+
             except Exception as e:
-                print(f"Error reading from server: {str(e)}")
+                print(f"Error reading response from server: {str(e)}")
                 break
 
     def update_lobby_list(self, lobbies):
