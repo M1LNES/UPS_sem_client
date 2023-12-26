@@ -9,7 +9,7 @@ def create_nick_message(nick):
 
 def is_message_valid(message):
     if len(message) < (
-            len(message_constants.MAGIC) + message_constants.MESSAGE_TYPE_LENGTH + message_constants.MESSAGE_TYPE_LENGTH):
+            len(message_constants.MAGIC) + message_constants.MESSAGE_TYPE_LENGTH + message_constants.MESSAGE_LENGTH_FORMAT):
         return False
     # Magic
     magic = message[:len(message_constants.MAGIC)]
