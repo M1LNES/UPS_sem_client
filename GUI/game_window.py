@@ -258,10 +258,12 @@ class GameWindow:
         )
         self.climbers.append(climber)
 
+        # Display the nickname vertically
         nickname_text = self.mountain_canvas.create_text(
-            x_position + 10, y_position - 10, text=nickname, fill="white"
+            x_position + 10, y_position - 10, text=nickname, fill="white", angle=-90
         )
         self.climbers.append(nickname_text)
+
 
 
 
