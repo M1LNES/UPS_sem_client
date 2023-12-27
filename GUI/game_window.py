@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from utils.client_to_server_messages import create_start_game_message
 from utils.client_to_server_messages import create_selected_letter_message
+from constants import message_constants
 
 
 class GameWindow:
@@ -72,12 +73,15 @@ class GameWindow:
 
     def refresh_gui(self):
         if self.game_ended:
+            self.update_climbers()
             self.show_final_panel()
         elif self.can_be_started and not self.game_started:
             self.start_button.grid(row=1, column=0, pady=10)
             self.actualize_current_players_label()
         elif self.game_started:
             self.initialize_game()
+            self.update_climbers()
+
         else:
             self.actualize_current_players_label()
 
@@ -127,6 +131,14 @@ class GameWindow:
 
             self.hint_label = ttk.Label(self.game_window, text="HINT::")
             self.hint_label.grid(row=6, column=0, pady=5)
+
+            self.climbers_frame = ttk.Frame(self.game_window)
+            self.climbers_frame.grid(row=8, column=0, pady=10)
+
+            self.mountain_canvas = tk.Canvas(self.climbers_frame, width=600, height=200, bg="grey")
+            self.mountain_canvas.pack()
+
+            self.climbers = []
 
             self.start_button.grid_forget()
 
@@ -214,7 +226,6 @@ class GameWindow:
         self.refresh_gui()
 
     def show_final_panel(self):
-        print("JSEM TU")
         if len(self.winners) > 1:
             self.unique_characters_label.config(text="WINNERS:" + ";".join(self.winners))
         else:
@@ -230,6 +241,31 @@ class GameWindow:
     def close_window(self):
         self.game_window.destroy()
         self.chat_window.deiconify()
+
+    def update_climbers(self):
+        self.mountain_canvas.delete("all")
+
+        for index, (nickname, points) in enumerate(self.points.items()):
+            self.draw_climber(nickname, points, index)
+
+    def draw_climber(self, nickname, points, index):
+        base_x_position = 20
+        x_position = base_x_position + index * 60
+        y_position = 200 - (points * 200 / message_constants.POINTS_TO_WIN)
+
+        climber = self.mountain_canvas.create_rectangle(
+            x_position, y_position, x_position + 20, y_position + 20, fill="blue", outline="black"
+        )
+        self.climbers.append(climber)
+
+        nickname_text = self.mountain_canvas.create_text(
+            x_position + 10, y_position - 10, text=nickname, fill="white"
+        )
+        self.climbers.append(nickname_text)
+
+
+
+
 
 
 
