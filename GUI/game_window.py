@@ -250,7 +250,7 @@ class GameWindow:
 
     def draw_climber(self, nickname, points, index):
         base_x_position = 20
-        x_position = base_x_position + index * 60
+        x_position = self.calculate_x_position(index, len(self.nicknames))
         y_position = 200 - (points * 200 / message_constants.POINTS_TO_WIN)
 
         climber = self.mountain_canvas.create_rectangle(
@@ -260,9 +260,18 @@ class GameWindow:
 
         # Display the nickname vertically
         nickname_text = self.mountain_canvas.create_text(
-            x_position + 10, y_position - 10, text=nickname, fill="white", angle=-90
-        )
+            x_position + 10, y_position - 10, text=nickname, fill="white")
         self.climbers.append(nickname_text)
+
+    def calculate_x_position(self, index, total_climbers):
+        base_x_position = 50
+        mountain_width = 600
+        available_width = mountain_width - 2 * base_x_position
+        section_width = available_width / total_climbers
+        x_position = base_x_position + index * section_width
+
+        return x_position
+
 
 
 
