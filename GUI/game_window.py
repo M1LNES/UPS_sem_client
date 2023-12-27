@@ -119,7 +119,7 @@ class GameWindow:
             self.nicknames_label = ttk.Label(self.game_window, text="Nicknames:")
             self.nicknames_label.grid(row=5, column=0, pady=5)
 
-            self.unique_characters_label = ttk.Label(self.game_window, text="Unique Characters:")
+            self.unique_characters_label = ttk.Label(self.game_window, text="Selected Characters:")
             self.unique_characters_label.grid(row=3, column=0, pady=5)
 
             self.masked_sentence_label = ttk.Label(self.game_window, text="Masked Sentence:")
@@ -138,9 +138,10 @@ class GameWindow:
         self.current_players_label.config(text=f"Current Players: {players_info}")
 
         if not self.round_over:
-            self.unique_characters_label.config(text=f"Unique Characters: {self.unique_characters}")
-            self.masked_sentence_label.config(text=f"Masked Sentence: {self.masked_sentence}")
-            self.hint_label.config(text=f"Hint: {self.hint}")
+            self.unique_characters_label.config(text=f"Selected Characters:\n {self.unique_characters}", font=("Courier", 10),anchor="center",justify="center",)
+            formatted_masked_sentence = " ".join(list(self.masked_sentence))
+            self.masked_sentence_label.config(text=f"Masked Sentence:\n {formatted_masked_sentence}", font=("Courier", 14),anchor="center",justify="center",)
+            self.hint_label.config(text=f"Hint:\n {self.hint}",font=("Courier", 12),anchor="center",justify="center",)
 
             # Clear existing buttons
             for button in self.buttons:
