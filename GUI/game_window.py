@@ -25,6 +25,7 @@ class GameWindow:
         self.game_ended = False
         self.winners = []
         self.chat_window = chat_window
+        self.round_over = False
 
     @property
     def can_be_started(self):
@@ -158,22 +159,23 @@ class GameWindow:
         for button in self.buttons:
             button.destroy()
 
-        self.keyboard_frame = ttk.Frame(self.game_window)
-        self.keyboard_frame.grid(row=7, column=0, pady=10)
+        if not self.round_over:
+            self.keyboard_frame = ttk.Frame(self.game_window)
+            self.keyboard_frame.grid(row=7, column=0, pady=10)
 
-        keyboard_layout = [
-            'QWERTYUIOP',
-            'ASDFGHJKL',
-            'ZXCVBNM'
-        ]
+            keyboard_layout = [
+                'QWERTYUIOP',
+                'ASDFGHJKL',
+                'ZXCVBNM'
+            ]
 
-        self.buttons = []
+            self.buttons = []
 
-        for i, row in enumerate(keyboard_layout):
-            for j, key in enumerate(row):
-                button = self.create_button(key, i + 6, j + 1)
-                self.buttons.append(button)
-
+            for i, row in enumerate(keyboard_layout):
+                for j, key in enumerate(row):
+                    button = self.create_button(key, i + 6, j + 1)
+        else:
+            self.round_over = False
 
     def create_button(self, key, row, col):
         button = tk.Button(self.keyboard_frame, text=key, width=5, height=2, command=lambda: self.button_click(key),
@@ -208,6 +210,8 @@ class GameWindow:
 
             self.masked_sentence = segments[1]
             self.hint = segments[0]
+            self.round_over = True
+            self.refresh_gui()
             self.pop_alert()
 
         else:
