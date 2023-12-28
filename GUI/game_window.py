@@ -3,7 +3,7 @@ from tkinter import ttk
 from utils.client_to_server_messages import create_start_game_message
 from utils.client_to_server_messages import create_selected_letter_message
 from constants import message_constants
-
+from tkinter import messagebox
 
 class GameWindow:
     def __init__(self, parent, server, chat_window):
@@ -21,7 +21,6 @@ class GameWindow:
         self.game_started = False
         self.keyboard_frame = None
         self.game_gui_mounted = False
-        self.round_over = False
         self.buttons = []
         self.game_ended = False
         self.winners = []
@@ -149,36 +148,32 @@ class GameWindow:
         self.nicknames_label.config(text=f"Nicknames and Points: {points_str}")
         self.current_players_label.config(text=f"Current Players: {players_info}")
 
-        if not self.round_over:
-            self.unique_characters_label.config(text=f"Selected Characters:\n {self.unique_characters}", font=("Courier", 10),anchor="center",justify="center",)
-            formatted_masked_sentence = " ".join(list(self.masked_sentence))
-            self.masked_sentence_label.config(text=f"Masked Sentence:\n {formatted_masked_sentence}", font=("Courier", 14),anchor="center",justify="center",)
-            self.hint_label.config(text=f"Hint:\n {self.hint}",font=("Courier", 12),anchor="center",justify="center",)
 
-            # Clear existing buttons
-            for button in self.buttons:
-                button.destroy()
+        self.unique_characters_label.config(text=f"Selected Characters:\n {self.unique_characters}", font=("Courier", 10),anchor="center",justify="center",)
+        formatted_masked_sentence = " ".join(list(self.masked_sentence))
+        self.masked_sentence_label.config(text=f"Masked Sentence:\n {formatted_masked_sentence}", font=("Courier", 14),anchor="center",justify="center",)
+        self.hint_label.config(text=f"Hint:\n {self.hint}",font=("Courier", 12),anchor="center",justify="center",)
 
-            self.keyboard_frame = ttk.Frame(self.game_window)
-            self.keyboard_frame.grid(row=7, column=0, pady=10)
+        # Clear existing buttons
+        for button in self.buttons:
+            button.destroy()
 
-            keyboard_layout = [
-                'QWERTYUIOP',
-                'ASDFGHJKL',
-                'ZXCVBNM'
-            ]
+        self.keyboard_frame = ttk.Frame(self.game_window)
+        self.keyboard_frame.grid(row=7, column=0, pady=10)
 
-            self.buttons = []
+        keyboard_layout = [
+            'QWERTYUIOP',
+            'ASDFGHJKL',
+            'ZXCVBNM'
+        ]
 
-            for i, row in enumerate(keyboard_layout):
-                for j, key in enumerate(row):
-                    button = self.create_button(key, i + 6, j + 1)
-                    self.buttons.append(button)
-        else:
-            self.unique_characters_label.config(text=f"ROUND OVER - sentence guessed")
-            self.masked_sentence_label.config(text=f"Guessed, the sentence was: {self.masked_sentence}")
-            self.hint_label.config(text=f"Hint of the sentence was: {self.hint}")
-            self.round_over = False
+        self.buttons = []
+
+        for i, row in enumerate(keyboard_layout):
+            for j, key in enumerate(row):
+                button = self.create_button(key, i + 6, j + 1)
+                self.buttons.append(button)
+
 
     def create_button(self, key, row, col):
         button = tk.Button(self.keyboard_frame, text=key, width=5, height=2, command=lambda: self.button_click(key),
@@ -213,8 +208,7 @@ class GameWindow:
 
             self.masked_sentence = segments[1]
             self.hint = segments[0]
-            self.round_over = True
-            self.refresh_gui()
+            self.pop_alert()
 
         else:
             print("Invalid message format")
@@ -271,6 +265,19 @@ class GameWindow:
         x_position = base_x_position + index * section_width
 
         return x_position
+
+    def pop_alert(self):
+        info_message = (
+            f"ROUND OVER - sentence guessed\n"
+            f"Guessed, the sentence was: {self.masked_sentence}\n"
+            f"Hint of the sentence was: {self.hint}\n\n"
+            f"Player Points:\n"
+        )
+
+        for nickname in self.nicknames:
+            info_message += f"{nickname}: {self.points.get(nickname, 0)} points\n"
+
+        messagebox.showinfo("Game Alert", info_message)
 
 
 
