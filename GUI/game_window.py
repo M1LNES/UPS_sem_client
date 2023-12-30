@@ -5,6 +5,7 @@ from utils.client_to_server_messages import create_selected_letter_message
 from constants import message_constants
 from tkinter import messagebox
 
+
 class GameWindow:
     def __init__(self, parent, server, chat_window):
         self.parent = parent
@@ -149,11 +150,12 @@ class GameWindow:
         self.nicknames_label.config(text=f"Nicknames and Points: {points_str}")
         self.current_players_label.config(text=f"Current Players: {players_info}")
 
-
-        self.unique_characters_label.config(text=f"Selected Characters:\n {self.unique_characters}", font=("Courier", 10),anchor="center",justify="center",)
+        self.unique_characters_label.config(text=f"Selected Characters:\n {self.unique_characters}",
+                                            font=("Courier", 10), anchor="center", justify="center", )
         formatted_masked_sentence = " ".join(list(self.masked_sentence))
-        self.masked_sentence_label.config(text=f"Masked Sentence:\n {formatted_masked_sentence}", font=("Courier", 14),anchor="center",justify="center",)
-        self.hint_label.config(text=f"Hint:\n {self.hint}",font=("Courier", 12),anchor="center",justify="center",)
+        self.masked_sentence_label.config(text=f"Masked Sentence:\n {formatted_masked_sentence}", font=("Courier", 14),
+                                          anchor="center", justify="center", )
+        self.hint_label.config(text=f"Hint:\n {self.hint}", font=("Courier", 12), anchor="center", justify="center", )
 
         # Clear existing buttons
         for button in self.buttons:
@@ -235,7 +237,6 @@ class GameWindow:
         self.game_window.after(10000, self.close_window)
         # self.chat_window.deiconify()
 
-
     def close_window(self):
         self.game_window.destroy()
         self.chat_window.deiconify()
@@ -283,13 +284,16 @@ class GameWindow:
 
         messagebox.showinfo("Game Alert", info_message)
 
+    def pop_cancel_alert(self):
+        info_message = (
+            f"One of the players left\n"
+            f"We are sorry but we must cancel this game\n"
+            f"Moving back to the main lobby\n\n"
+            f"Thanks for playing.\n"
+        )
 
+        messagebox.showinfo("Cancel Alert", info_message)
 
-
-
-
-
-
-
-
-
+    def cancel_game(self):
+        self.pop_cancel_alert()
+        self.close_window()

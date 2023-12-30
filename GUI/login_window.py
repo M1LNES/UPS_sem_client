@@ -122,6 +122,8 @@ class LoginWindow:
             self.game_window_initializer.end_the_game(message_body)
         elif message_type == message_constants.PING:
             self.send_pong()
+        elif message_type == message_constants.CANCEL:
+            self.game_window_initializer.cancel_game()
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)
