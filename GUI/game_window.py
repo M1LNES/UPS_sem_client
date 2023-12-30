@@ -7,7 +7,7 @@ from tkinter import messagebox
 
 
 class GameWindow:
-    def __init__(self, parent, server, chat_window):
+    def __init__(self, parent, server, chat_window, is_server_available):
         self.parent = parent
         self.game_window = None
         self.server = server
@@ -27,6 +27,15 @@ class GameWindow:
         self.winners = []
         self.chat_window = chat_window
         self.round_over = False
+        self.is_server_available = is_server_available
+        self.status_label = None
+        self.connection_dot = None
+        self.connection_label = None
+
+
+    def update_connection_status(self, is_server_available):
+        color = "green" if is_server_available else "red"
+        self.connection_dot.configure(background=color)
 
     @property
     def can_be_started(self):
@@ -65,10 +74,16 @@ class GameWindow:
         self.status_label = ttk.Label(self.game_window, text="Waiting for players")
         self.status_label.grid(row=0, column=0, pady=10)
 
+        self.connection_label = ttk.Label(self.game_window, text="Server Connection:")
+        self.connection_label.grid(row=1, column=0, pady=5)
+
+        self.connection_dot = ttk.Label(self.game_window, width=2, background="green")
+        self.connection_dot.grid(row=1, column=1, pady=5)
+
         self.start_button = ttk.Button(self.game_window, text="Start the game", command=self.start_game)
 
         self.current_players_label = ttk.Label(self.game_window, text="Current Players:")
-        self.current_players_label.grid(row=2, column=0, pady=5)
+        self.current_players_label.grid(row=3, column=0, pady=5)
 
         self.refresh_gui()
 
@@ -77,7 +92,7 @@ class GameWindow:
             self.update_climbers()
             self.show_final_panel()
         elif self.can_be_started and not self.game_started:
-            self.start_button.grid(row=1, column=0, pady=10)
+            self.start_button.grid(row=2, column=0, pady=10)
             self.actualize_current_players_label()
         elif self.game_started:
             self.initialize_game()
@@ -122,19 +137,19 @@ class GameWindow:
             self.status_label.config(text="Game started")
 
             self.nicknames_label = ttk.Label(self.game_window, text="Nicknames:")
-            self.nicknames_label.grid(row=5, column=0, pady=5)
+            self.nicknames_label.grid(row=6, column=0, pady=5)
 
             self.unique_characters_label = ttk.Label(self.game_window, text="Selected Characters:")
-            self.unique_characters_label.grid(row=3, column=0, pady=5)
+            self.unique_characters_label.grid(row=4, column=0, pady=5)
 
             self.masked_sentence_label = ttk.Label(self.game_window, text="Masked Sentence:")
-            self.masked_sentence_label.grid(row=4, column=0, pady=5)
+            self.masked_sentence_label.grid(row=5, column=0, pady=5)
 
             self.hint_label = ttk.Label(self.game_window, text="HINT::")
-            self.hint_label.grid(row=6, column=0, pady=5)
+            self.hint_label.grid(row=7, column=0, pady=5)
 
             self.climbers_frame = ttk.Frame(self.game_window)
-            self.climbers_frame.grid(row=8, column=0, pady=10)
+            self.climbers_frame.grid(row=9, column=0, pady=10)
 
             self.mountain_canvas = tk.Canvas(self.climbers_frame, width=600, height=200, bg="grey")
             self.mountain_canvas.pack()
@@ -163,7 +178,7 @@ class GameWindow:
 
         if not self.round_over:
             self.keyboard_frame = ttk.Frame(self.game_window)
-            self.keyboard_frame.grid(row=7, column=0, pady=10)
+            self.keyboard_frame.grid(row=8, column=0, pady=10)
 
             keyboard_layout = [
                 'QWERTYUIOP',
@@ -297,3 +312,4 @@ class GameWindow:
     def cancel_game(self):
         self.pop_cancel_alert()
         self.close_window()
+

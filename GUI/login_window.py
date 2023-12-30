@@ -40,18 +40,20 @@ class LoginWindow:
         self.game_window_initializer = None
         self.buffer = b''
         self.timeout_duration = 5
-        self.last_message_time = time.time()
+        self.last_message_time = None
         self.timer_thread = None
         self.timer_stop_event = threading.Event()
+        self.is_server_available = False
 
     def check_timeout(self):
         while not self.timer_stop_event.is_set():
             current_time = time.time()
             elapsed_time = current_time - self.last_message_time
-
             if elapsed_time >= self.timeout_duration:
                 print("Server connection unavailable.")
-
+                self.is_server_available = False
+            else:
+                self.is_server_available = True
             if elapsed_time >= 50:
                 print("Vypinam a davam login obrazovku.")
                 self.lobby_window_initializer.chat_window.destroy()
@@ -62,6 +64,7 @@ class LoginWindow:
                 self.timer_stop_event.set()
                 return
 
+            self.update_children_state()
             time.sleep(2)
     def connect_to_server(self):
         ip = self.server_ip_entry.get()
@@ -79,11 +82,11 @@ class LoginWindow:
 
             self.response_thread = threading.Thread(target=self.handle_server_response)
             self.response_thread.start()
-
+            self.is_server_available = True
             self.open_chat_window(self.server)
 
             self.server.sendall((message + "\n").encode())
-
+            self.last_message_time = time.time()
             self.timer_thread = threading.Thread(target=self.check_timeout)
             self.timer_thread.start()
 
@@ -134,7 +137,8 @@ class LoginWindow:
             if success:
                 self.lobby_window_initializer.close_lobby_window()
                 self.game_window_initializer = GameWindow(self.root, self.server,
-                                                          self.lobby_window_initializer.chat_window)
+                                                          self.lobby_window_initializer.chat_window,
+                                                          self.is_server_available)
                 self.game_window_initializer.open_game_window()
         elif message_type == message_constants.CAN_GAME_START:
             canBeStarted = messageHandler.can_game_begin(message_body)
@@ -167,3 +171,9 @@ class LoginWindow:
     def send_pong(self):
         message = messageHandler.create_pong_message()
         self.server.sendall((message + "\n").encode())
+
+    def update_children_state(self):
+        if self.game_window_initializer is not None:
+            self.game_window_initializer.update_connection_status(self.is_server_available)
+        if self.lobby_window_initializer is not None:
+            self.lobby_window_initializer.update_connection_status(self.is_server_available)
