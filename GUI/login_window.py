@@ -1,5 +1,7 @@
 import socket
 import threading
+import time
+
 import utils.client_to_server_messages as messageHandler
 import utils.validation as validate
 from tkinter import ttk
@@ -37,7 +39,30 @@ class LoginWindow:
         self.lobby_window_initializer = None
         self.game_window_initializer = None
         self.buffer = b''
+        self.timeout_duration = 5
+        self.last_message_time = time.time()
+        self.timer_thread = None
+        self.timer_stop_event = threading.Event()
 
+    def check_timeout(self):
+        while not self.timer_stop_event.is_set():
+            current_time = time.time()
+            elapsed_time = current_time - self.last_message_time
+
+            if elapsed_time >= self.timeout_duration:
+                print("Server connection unavailable.")
+
+            if elapsed_time >= 50:
+                print("Vypinam a davam login obrazovku.")
+                self.lobby_window_initializer.chat_window.destroy()
+                if self.game_window_initializer is not None:
+                    self.game_window_initializer.game_window.destroy()
+                self.server = None
+                self.root.deiconify()
+                self.timer_stop_event.set()
+                return
+
+            time.sleep(2)
     def connect_to_server(self):
         ip = self.server_ip_entry.get()
         port = int(self.server_port_entry.get())
@@ -58,6 +83,9 @@ class LoginWindow:
             self.open_chat_window(self.server)
 
             self.server.sendall((message + "\n").encode())
+
+            self.timer_thread = threading.Thread(target=self.check_timeout)
+            self.timer_thread.start()
 
             self.root.withdraw()
         except Exception as e:
@@ -92,6 +120,8 @@ class LoginWindow:
         self.lobby_window_initializer.update_lobby_list(lobbies)
 
     def handle_message(self, message):
+        self.last_message_time = time.time()
+
         message_type = message[len(message_constants.MAGIC) + message_constants.MESSAGE_LENGTH_FORMAT:len(
             message_constants.MAGIC) + message_constants.MESSAGE_LENGTH_FORMAT + message_constants.MESSAGE_TYPE_LENGTH]
         message_body = message[len(
