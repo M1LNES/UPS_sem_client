@@ -103,7 +103,8 @@ class LoginWindow:
             success = messageHandler.joined_lobby_successfully(message_body)
             if success:
                 self.lobby_window_initializer.close_lobby_window()
-                self.game_window_initializer = GameWindow(self.root, self.server, self.lobby_window_initializer.chat_window)
+                self.game_window_initializer = GameWindow(self.root, self.server,
+                                                          self.lobby_window_initializer.chat_window)
                 self.game_window_initializer.open_game_window()
         elif message_type == message_constants.CAN_GAME_START:
             canBeStarted = messageHandler.can_game_begin(message_body)
@@ -119,6 +120,9 @@ class LoginWindow:
             self.game_window_initializer.show_guessed_sentence(message_body)
         elif message_type == message_constants.GAME_ENDING:
             self.game_window_initializer.end_the_game(message_body)
+        elif message_type == message_constants.PING:
+            self.send_pong()
+
     def handle_response_from_server(self, response):
         print("Server response: ", response)
         response = response.replace("\n", "")
@@ -127,3 +131,7 @@ class LoginWindow:
         else:
             print("Not valid")
         pass
+
+    def send_pong(self):
+        message = messageHandler.create_pong_message()
+        self.server.sendall((message + "\n").encode())
