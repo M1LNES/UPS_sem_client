@@ -11,7 +11,7 @@ class GameWindow:
         self.parent = parent
         self.game_window = None
         self.server = server
-        self._can_be_started = False  # Use a private attribute with a leading underscore
+        self._can_be_started = False
         self._current_players = 0
         self._max_players = 0
         self.nicknames = []
@@ -31,6 +31,7 @@ class GameWindow:
         self.status_label = None
         self.connection_dot = None
         self.connection_label = None
+        self.pending_users = []
 
 
     def update_connection_status(self, is_server_available):
@@ -78,12 +79,12 @@ class GameWindow:
         self.connection_label.grid(row=1, column=0, pady=5)
 
         self.connection_dot = ttk.Label(self.game_window, width=2, background="green")
-        self.connection_dot.grid(row=1, column=1, pady=5)
+        self.connection_dot.grid(row=2, column=0, pady=5)
 
         self.start_button = ttk.Button(self.game_window, text="Start the game", command=self.start_game)
 
         self.current_players_label = ttk.Label(self.game_window, text="Current Players:")
-        self.current_players_label.grid(row=3, column=0, pady=5)
+        self.current_players_label.grid(row=4, column=0, pady=5)
 
         self.refresh_gui()
 
@@ -92,7 +93,7 @@ class GameWindow:
             self.update_climbers()
             self.show_final_panel()
         elif self.can_be_started and not self.game_started:
-            self.start_button.grid(row=2, column=0, pady=10)
+            self.start_button.grid(row=3, column=0, pady=10)
             self.actualize_current_players_label()
         elif self.game_started:
             self.initialize_game()
@@ -137,19 +138,19 @@ class GameWindow:
             self.status_label.config(text="Game started")
 
             self.nicknames_label = ttk.Label(self.game_window, text="Nicknames:")
-            self.nicknames_label.grid(row=6, column=0, pady=5)
+            self.nicknames_label.grid(row=7, column=0, pady=5)
 
             self.unique_characters_label = ttk.Label(self.game_window, text="Selected Characters:")
-            self.unique_characters_label.grid(row=4, column=0, pady=5)
+            self.unique_characters_label.grid(row=5, column=0, pady=5)
 
             self.masked_sentence_label = ttk.Label(self.game_window, text="Masked Sentence:")
-            self.masked_sentence_label.grid(row=5, column=0, pady=5)
+            self.masked_sentence_label.grid(row=6, column=0, pady=5)
 
             self.hint_label = ttk.Label(self.game_window, text="HINT::")
-            self.hint_label.grid(row=7, column=0, pady=5)
+            self.hint_label.grid(row=8, column=0, pady=5)
 
             self.climbers_frame = ttk.Frame(self.game_window)
-            self.climbers_frame.grid(row=9, column=0, pady=10)
+            self.climbers_frame.grid(row=10, column=0, pady=10)
 
             self.mountain_canvas = tk.Canvas(self.climbers_frame, width=600, height=200, bg="grey")
             self.mountain_canvas.pack()
@@ -178,7 +179,7 @@ class GameWindow:
 
         if not self.round_over:
             self.keyboard_frame = ttk.Frame(self.game_window)
-            self.keyboard_frame.grid(row=8, column=0, pady=10)
+            self.keyboard_frame.grid(row=9, column=0, pady=10)
 
             keyboard_layout = [
                 'QWERTYUIOP',
@@ -312,4 +313,33 @@ class GameWindow:
     def cancel_game(self):
         self.pop_cancel_alert()
         self.close_window()
+
+    def update_pending_users(self, pending_user):
+        print("User: ", pending_user)
+        if pending_user not in self.pending_users:
+            self.pending_users.append(pending_user)
+            active_players = [f"{nickname}: {self.points[nickname]}" for nickname in self.nicknames if
+                              nickname not in self.pending_users]
+            pending_players = [f"[Lost Connection] {nickname}: {self.points[nickname]}" for nickname in
+                               self.pending_users]
+
+            all_players = active_players + pending_players
+            points_str = ", ".join(all_players)
+
+            self.nicknames_label.config(text=f"Nicknames and Points: {points_str}")
+
+    def remove_pending_user(self, user):
+        if user in self.pending_users:
+            self.pending_users.remove(user)
+            active_players = [f"{nickname}: {self.points[nickname]}" for nickname in self.nicknames if
+                              nickname not in self.pending_users]
+            pending_players = [f"[Lost Connection] {nickname}: {self.points[nickname]}" for nickname in
+                               self.pending_users]
+
+            all_players = active_players + pending_players
+            points_str = ", ".join(all_players)
+
+            self.nicknames_label.config(text=f"Nicknames and Points: {points_str}")
+
+
 

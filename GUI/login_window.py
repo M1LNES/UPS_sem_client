@@ -158,6 +158,10 @@ class LoginWindow:
             self.send_pong()
         elif message_type == message_constants.CANCEL:
             self.game_window_initializer.cancel_game()
+        elif message_type == message_constants.PENDING_USER:
+            self.game_window_initializer.update_pending_users(message_body)
+        elif message_type == message_constants.CONNECTED_USER:
+            self.game_window_initializer.remove_pending_user(message_body)
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)
