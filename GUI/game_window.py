@@ -311,7 +311,7 @@ class GameWindow:
     def pop_cancel_alert(self):
         info_message = (
             f"One of the players left\n"
-            f"We are sorry but we must cancel this game\n"git
+            f"We are sorry but we must cancel this game\n"
             f"Moving back to the main lobby\n\n"
             f"Thanks for playing.\n"
         )
