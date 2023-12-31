@@ -301,19 +301,27 @@ class GameWindow:
         for nickname in self.nicknames:
             info_message += f"{nickname}: {self.points.get(nickname, 0)} points\n"
 
-        alert_thread = threading.Thread(target=show_info_message, args=(info_message,))
-        alert_thread.start()
+        # Create a Toplevel window for the alert
+        alert_window = tk.Toplevel(self.parent)
+        alert_window.title("Game Alert")
+
+        label = ttk.Label(alert_window, text=info_message)
+        label.pack(padx=10, pady=10)
 
     def pop_cancel_alert(self):
         info_message = (
             f"One of the players left\n"
-            f"We are sorry but we must cancel this game\n"
+            f"We are sorry but we must cancel this game\n"git
             f"Moving back to the main lobby\n\n"
             f"Thanks for playing.\n"
         )
 
-        alert_thread = threading.Thread(target=show_info_message, args=(info_message,))
-        alert_thread.start()
+        # Create a Toplevel window for the cancel alert
+        cancel_alert_window = tk.Toplevel(self.parent)
+        cancel_alert_window.title("Cancel Alert")
+
+        label = ttk.Label(cancel_alert_window, text=info_message)
+        label.pack(padx=10, pady=10)
 
 
     def cancel_game(self):
