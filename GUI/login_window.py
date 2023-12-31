@@ -44,6 +44,7 @@ class LoginWindow:
         self.timer_thread = None
         self.timer_stop_event = threading.Event()
         self.is_server_available = False
+        self.player_nickname = None
 
     def check_timeout(self):
         while not self.timer_stop_event.is_set():
@@ -73,6 +74,7 @@ class LoginWindow:
 
         if not (validate.validate_name(nickname) and validate.validate_server_ip(ip) and validate.validate_port(port)):
             return
+        self.player_nickname = nickname
 
         message = messageHandler.create_nick_message(self.nickname_entry.get())
 
@@ -162,6 +164,8 @@ class LoginWindow:
             self.game_window_initializer.update_pending_users(message_body)
         elif message_type == message_constants.CONNECTED_USER:
             self.game_window_initializer.remove_pending_user(message_body)
+        elif message_type == message_constants.LETTER_SELECTED:
+            self.game_window_initializer.keyboard_frame.grid_forget()
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)

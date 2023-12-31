@@ -1,3 +1,4 @@
+import threading
 import tkinter as tk
 from tkinter import ttk
 from utils.client_to_server_messages import create_start_game_message
@@ -6,6 +7,8 @@ from constants import message_constants
 from tkinter import messagebox
 
 
+def show_info_message(info_message):
+    messagebox.showinfo("Cancel Alert", info_message)
 class GameWindow:
     def __init__(self, parent, server, chat_window, is_server_available):
         self.parent = parent
@@ -33,10 +36,10 @@ class GameWindow:
         self.connection_label = None
         self.pending_users = []
 
-
     def update_connection_status(self, is_server_available):
-        color = "green" if is_server_available else "red"
-        self.connection_dot.configure(background=color)
+        if self.connection_dot is not None and self.connection_dot.winfo_exists():
+            color = "green" if is_server_available else "red"
+            self.connection_dot.configure(background=color)
 
     @property
     def can_be_started(self):
@@ -206,7 +209,7 @@ class GameWindow:
         return button
 
     def button_click(self, key):
-        self.keyboard_frame.grid_forget()
+        # self.keyboard_frame.grid_forget()
         message = create_selected_letter_message(key)
         self.server.sendall((message + "\n").encode())
 
@@ -298,7 +301,8 @@ class GameWindow:
         for nickname in self.nicknames:
             info_message += f"{nickname}: {self.points.get(nickname, 0)} points\n"
 
-        messagebox.showinfo("Game Alert", info_message)
+        alert_thread = threading.Thread(target=show_info_message, args=(info_message,))
+        alert_thread.start()
 
     def pop_cancel_alert(self):
         info_message = (
@@ -308,14 +312,15 @@ class GameWindow:
             f"Thanks for playing.\n"
         )
 
-        messagebox.showinfo("Cancel Alert", info_message)
+        alert_thread = threading.Thread(target=show_info_message, args=(info_message,))
+        alert_thread.start()
+
 
     def cancel_game(self):
         self.pop_cancel_alert()
         self.close_window()
 
     def update_pending_users(self, pending_user):
-        print("User: ", pending_user)
         if pending_user not in self.pending_users:
             self.pending_users.append(pending_user)
             active_players = [f"{nickname}: {self.points[nickname]}" for nickname in self.nicknames if

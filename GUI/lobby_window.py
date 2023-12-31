@@ -55,5 +55,7 @@ class LobbyWindow:
         self.chat_window.withdraw()
 
     def update_connection_status(self, is_server_available):
-        color = "green" if is_server_available else "red"
-        self.connection_status_dot.configure(background=color)
+        if self.connection_status_dot is not None and self.connection_status_dot.winfo_exists():
+            color = "green" if is_server_available else "red"
+            self.connection_status_dot.configure(background=color)
+
