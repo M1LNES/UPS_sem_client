@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from utils.client_to_server_messages import create_start_game_message
 from utils.client_to_server_messages import create_selected_letter_message
+from utils.client_to_server_messages import create_resend_state_message
 from constants import message_constants
 from tkinter import messagebox
 
@@ -354,5 +355,7 @@ class GameWindow:
 
             self.nicknames_label.config(text=f"Nicknames and Points: {points_str}")
 
-
+    def resend_state(self):
+        message = create_resend_state_message()
+        self.server.sendall((message + "\n").encode())
 

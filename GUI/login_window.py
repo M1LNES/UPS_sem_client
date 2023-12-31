@@ -46,14 +46,19 @@ class LoginWindow:
         self.is_server_available = False
         self.player_nickname = None
 
+
     def check_timeout(self):
         while not self.timer_stop_event.is_set():
             current_time = time.time()
             elapsed_time = current_time - self.last_message_time
             if elapsed_time >= self.timeout_duration:
-                print("Server connection unavailable.")
+                if self.is_server_available:  # change of the state - connected -> not connected
+                    print("Lost connection to the server.")
                 self.is_server_available = False
             else:
+                if not self.is_server_available:  # not connected -> connected
+                    if self.game_window_initializer is not None:
+                        self.game_window_initializer.resend_state()
                 self.is_server_available = True
             if elapsed_time >= 50:
                 print("Vypinam a davam login obrazovku.")
@@ -166,6 +171,8 @@ class LoginWindow:
             self.game_window_initializer.remove_pending_user(message_body)
         elif message_type == message_constants.LETTER_SELECTED:
             self.game_window_initializer.keyboard_frame.grid_forget()
+        elif message_type == message_constants.RETRIEVING_STATE
+            print("Prisla mi zadost o obnoveni stavu")
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)

@@ -99,3 +99,7 @@ def create_selected_letter_message(letter):
 def create_pong_message():
     formatted_message = f"{message_constants.MAGIC}000{message_constants.PONG}"
     return formatted_message
+
+def create_resend_state_message():
+    formatted_message = f"{message_constants.MAGIC}000{message_constants.RETRIEVING_STATE}"
+    return formatted_message
