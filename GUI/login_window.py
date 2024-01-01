@@ -171,7 +171,7 @@ class LoginWindow:
             self.game_window_initializer.remove_pending_user(message_body)
         elif message_type == message_constants.LETTER_SELECTED:
             self.game_window_initializer.keyboard_frame.grid_forget()
-        elif message_type == message_constants.RETRIEVING_STATE
+        elif message_type == message_constants.RETRIEVING_STATE:
             print("Prisla mi zadost o obnoveni stavu")
 
     def handle_response_from_server(self, response):
