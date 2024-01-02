@@ -46,7 +46,6 @@ class LoginWindow:
         self.is_server_available = False
         self.player_nickname = None
 
-
     def check_timeout(self):
         while not self.timer_stop_event.is_set():
             current_time = time.time()
@@ -62,7 +61,11 @@ class LoginWindow:
                 self.lobby_window_initializer.chat_window.destroy()
                 if self.game_window_initializer is not None:
                     self.game_window_initializer.game_window.destroy()
-                self.server.close()
+                try:
+                    if self.server:
+                        self.server.close()
+                except Exception as e:
+                    print(f"Error closing the socket: {e}")
                 self.server = None
                 self.root.deiconify()
                 self.timer_stop_event.set()
@@ -70,6 +73,7 @@ class LoginWindow:
 
             self.update_children_state()
             time.sleep(2)
+
     def connect_to_server(self):
         ip = self.server_ip_entry.get()
         port = int(self.server_port_entry.get())
