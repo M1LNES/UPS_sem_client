@@ -42,7 +42,7 @@ class LoginWindow:
         self.timeout_duration = 6
         self.last_message_time = None
         self.timer_thread = None
-        self.timer_stop_event = threading.Event()
+        self.timer_stop_event = None
         self.is_server_available = False
         self.player_nickname = None
 
@@ -56,15 +56,13 @@ class LoginWindow:
                     print("Lost connection to the server.")
                 self.is_server_available = False
             else:
-                # if not self.is_server_available:  # not connected -> connected
-                #     if self.game_window_initializer is not None:
-                #         self.game_window_initializer.resend_state()
                 self.is_server_available = True
             if elapsed_time >= 50:
                 print("Vypinam a davam login obrazovku.")
                 self.lobby_window_initializer.chat_window.destroy()
                 if self.game_window_initializer is not None:
                     self.game_window_initializer.game_window.destroy()
+                self.server.close()
                 self.server = None
                 self.root.deiconify()
                 self.timer_stop_event.set()
@@ -94,6 +92,7 @@ class LoginWindow:
 
             self.server.sendall((message + "\n").encode())
             self.last_message_time = time.time()
+            self.timer_stop_event = threading.Event()
             self.timer_thread = threading.Thread(target=self.check_timeout)
             self.timer_thread.start()
 
