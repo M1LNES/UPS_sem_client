@@ -1,4 +1,3 @@
-import threading
 import tkinter as tk
 from tkinter import ttk
 from utils.client_to_server_messages import create_start_game_message

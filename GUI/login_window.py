@@ -45,33 +45,36 @@ class LoginWindow:
         self.timer_stop_event = None
         self.is_server_available = False
         self.player_nickname = None
+        self.lock = threading.Lock()
 
     def check_timeout(self):
         while not self.timer_stop_event.is_set():
-            current_time = time.time()
-            elapsed_time = current_time - self.last_message_time
-            if elapsed_time >= self.timeout_duration:
-                if self.is_server_available:  # change of the state - connected -> not connected
-                    print("Lost connection to the server.")
-                self.is_server_available = False
-            else:
-                self.is_server_available = True
-            if elapsed_time >= 50:
-                print("Vypinam a davam login obrazovku.")
-                self.lobby_window_initializer.chat_window.destroy()
-                if self.game_window_initializer is not None:
-                    self.game_window_initializer.game_window.destroy()
-                try:
-                    if self.server:
-                        self.server.close()
-                except Exception as e:
-                    print(f"Error closing the socket: {e}")
-                self.server = None
-                self.root.deiconify()
-                self.timer_stop_event.set()
-                return
+            with self.lock:
+                current_time = time.time()
+                elapsed_time = current_time - self.last_message_time
+                if elapsed_time >= self.timeout_duration:
+                    if self.is_server_available:  # change of the state - connected -> not connected
+                        print("Lost connection to the server.")
+                    self.is_server_available = False
+                else:
+                    self.is_server_available = True
+                if elapsed_time >= 50:
+                    print("Vypinam a davam login obrazovku.")
+                    self.lobby_window_initializer.chat_window.destroy()
+                    if self.game_window_initializer is not None:
+                        self.game_window_initializer.game_window.destroy()
+                    try:
+                        if self.server:
+                            self.server.close()
+                    except Exception as e:
+                        print(f"Error closing the socket: {e}")
+                    self.server = None
+                    self.root.deiconify()
+                    self.timer_stop_event.set()
+                    return
 
-            self.update_children_state()
+                self.update_children_state()
+
             time.sleep(2)
 
     def connect_to_server(self):
@@ -185,7 +188,8 @@ class LoginWindow:
         print("Server response: ", response)
         response = response.replace("\n", "")
         if messageHandler.is_message_valid(response):
-            self.handle_message(response)
+            with self.lock:
+                self.handle_message(response)
         else:
             print("Not valid")
         pass
