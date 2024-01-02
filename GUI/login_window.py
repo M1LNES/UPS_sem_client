@@ -39,7 +39,7 @@ class LoginWindow:
         self.lobby_window_initializer = None
         self.game_window_initializer = None
         self.buffer = b''
-        self.timeout_duration = 5
+        self.timeout_duration = 6
         self.last_message_time = None
         self.timer_thread = None
         self.timer_stop_event = threading.Event()
@@ -56,9 +56,9 @@ class LoginWindow:
                     print("Lost connection to the server.")
                 self.is_server_available = False
             else:
-                if not self.is_server_available:  # not connected -> connected
-                    if self.game_window_initializer is not None:
-                        self.game_window_initializer.resend_state()
+                # if not self.is_server_available:  # not connected -> connected
+                #     if self.game_window_initializer is not None:
+                #         self.game_window_initializer.resend_state()
                 self.is_server_available = True
             if elapsed_time >= 50:
                 print("Vypinam a davam login obrazovku.")
@@ -131,6 +131,10 @@ class LoginWindow:
 
     def handle_message(self, message):
         self.last_message_time = time.time()
+        if not self.is_server_available:
+            if self.game_window_initializer is not None:
+                self.game_window_initializer.resend_state()
+        self.is_server_available = True
 
         message_type = message[len(message_constants.MAGIC) + message_constants.MESSAGE_LENGTH_FORMAT:len(
             message_constants.MAGIC) + message_constants.MESSAGE_LENGTH_FORMAT + message_constants.MESSAGE_TYPE_LENGTH]
