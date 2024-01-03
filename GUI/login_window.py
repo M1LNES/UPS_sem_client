@@ -8,6 +8,7 @@ from tkinter import ttk
 from constants import message_constants
 from GUI.lobby_window import LobbyWindow
 from GUI.game_window import GameWindow
+from utils.validation import pop_alert_invalid_login_params, pop_alert_not_joined, pop_alert_connection_lost, pop_alert_disconnected
 
 
 class LoginWindow:
@@ -54,12 +55,12 @@ class LoginWindow:
                 elapsed_time = current_time - self.last_message_time
                 if elapsed_time >= self.timeout_duration:
                     if self.is_server_available:  # change of the state - connected -> not connected
-                        print("Lost connection to the server.")
+                        pop_alert_connection_lost(self.root)
                     self.is_server_available = False
                 else:
                     self.is_server_available = True
                 if elapsed_time >= 30:
-                    print("Vypinam a davam login obrazovku.")
+                    pop_alert_disconnected(self.root)
                     self.lobby_window_initializer.chat_window.destroy()
                     if self.game_window_initializer is not None:
                         self.game_window_initializer.game_window.destroy()
@@ -83,6 +84,7 @@ class LoginWindow:
         nickname = self.nickname_entry.get()
 
         if not (validate.validate_name(nickname) and validate.validate_server_ip(ip) and validate.validate_port(port)):
+            pop_alert_invalid_login_params(self.root)
             return
         self.player_nickname = nickname
 
@@ -107,7 +109,7 @@ class LoginWindow:
 
             self.root.withdraw()
         except Exception as e:
-            print(f"Error connecting: {str(e)}")
+            pop_alert_not_joined(self.root)
 
     def open_chat_window(self, server):
         self.lobby_window_initializer = LobbyWindow(self.root, server)
