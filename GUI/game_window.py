@@ -106,7 +106,6 @@ class GameWindow:
         elif self.game_started:
             self.initialize_game()
             self.update_climbers()
-
         else:
             self.actualize_current_players_label()
 
