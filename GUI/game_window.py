@@ -71,9 +71,14 @@ class GameWindow:
             self._max_players = value
             self.refresh_gui()
 
+    def on_closing(self):
+        self.parent.destroy()
+
     def open_game_window(self):
         self.game_window = tk.Toplevel(self.parent)
         self.game_window.title("Game Window")
+        self.game_window.protocol("WM_DELETE_WINDOW", self.on_closing)
+
 
         self.status_label = ttk.Label(self.game_window, text="Waiting for players")
         self.status_label.grid(row=0, column=0, pady=10)

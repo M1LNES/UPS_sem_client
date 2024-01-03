@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
+import sys
 from utils.client_to_server_messages import create_lobby_joining_message
 
 
@@ -13,9 +13,13 @@ class LobbyWindow:
         self.connection_status_label = None
         self.connection_status_dot = None
 
+    def on_closing(self):
+        self.parent.destroy()
+
     def open_chat_window(self):
         self.chat_window = tk.Toplevel(self.parent)
         self.chat_window.title("Lobby Window")
+        self.chat_window.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.lobby_listbox = tk.Listbox(self.chat_window)
         self.lobby_listbox.pack(pady=10, fill="both", expand=True)

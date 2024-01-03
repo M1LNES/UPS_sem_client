@@ -93,6 +93,7 @@ class LoginWindow:
             self.server.connect((ip, port))
 
             self.response_thread = threading.Thread(target=self.handle_server_response)
+            self.response_thread.daemon = True
             self.response_thread.start()
             self.is_server_available = True
             self.open_chat_window(self.server)
@@ -101,6 +102,7 @@ class LoginWindow:
             self.last_message_time = time.time()
             self.timer_stop_event = threading.Event()
             self.timer_thread = threading.Thread(target=self.check_timeout)
+            self.timer_thread.daemon = True
             self.timer_thread.start()
 
             self.root.withdraw()
