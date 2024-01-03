@@ -184,7 +184,7 @@ class LoginWindow:
         elif message_type == message_constants.LETTER_SELECTED:
             self.game_window_initializer.keyboard_frame.grid_forget()
         elif message_type == message_constants.RETRIEVING_STATE:
-            print("Prisla mi zadost o obnoveni stavu")
+            self.game_window_initializer.retrieve_state(message_body)
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)

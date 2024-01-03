@@ -363,3 +363,27 @@ class GameWindow:
         message = create_resend_state_message()
         self.server.sendall((message + "\n").encode())
 
+    def retrieve_state(self, message_body):
+        self.game_started = True
+        segments = message_body.split('|')
+
+        if len(segments) == 5:
+            player_info = segments[0].split(';')
+            self.nicknames = []
+            self.points = {}
+
+            for player_data in player_info:
+                player_data_parts = player_data.split(':')
+                if len(player_data_parts) == 2:
+                    nickname, points_str = player_data_parts
+                    self.nicknames.append(nickname)
+                    self.points[nickname] = int(points_str)
+
+            self.unique_characters = segments[1]
+            self.masked_sentence = segments[2]
+            self.hint = segments[3]
+            self.refresh_gui()
+            if segments[4] == 1:
+                self.keyboard_frame.grid_forget()
+        else:
+            return None
