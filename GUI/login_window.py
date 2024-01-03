@@ -58,7 +58,7 @@ class LoginWindow:
                     self.is_server_available = False
                 else:
                     self.is_server_available = True
-                if elapsed_time >= 50:
+                if elapsed_time >= 60:
                     print("Vypinam a davam login obrazovku.")
                     self.lobby_window_initializer.chat_window.destroy()
                     if self.game_window_initializer is not None:
