@@ -8,7 +8,7 @@ from tkinter import ttk
 from constants import message_constants
 from GUI.lobby_window import LobbyWindow
 from GUI.game_window import GameWindow
-from utils.validation import pop_alert_invalid_login_params, pop_alert_not_joined, pop_alert_connection_lost, pop_alert_disconnected
+from utils.validation import pop_alert_invalid_login_params, pop_alert_not_joined, pop_alert_connection_lost, pop_alert_disconnected, pop_alert_already_in_game
 
 
 class LoginWindow:
@@ -187,6 +187,8 @@ class LoginWindow:
             self.game_window_initializer.keyboard_frame.grid_forget()
         elif message_type == message_constants.RETRIEVING_STATE:
             self.game_window_initializer.retrieve_state(message_body)
+        elif message_type == message_constants.ALREADY_IN_GAME:
+            pop_alert_already_in_game(self.root)
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)
