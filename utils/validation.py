@@ -3,6 +3,9 @@ import tkinter as tk
 from tkinter import ttk
 
 
+# Manager of validation
+# contains a lot of functions that validates message bodies
+
 def validate_name(name):
     pattern = re.compile(r'^[a-zA-Z0-9_]+$')
     return bool(pattern.match(name))

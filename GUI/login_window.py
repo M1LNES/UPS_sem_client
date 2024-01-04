@@ -12,6 +12,7 @@ from utils.validation import pop_alert_invalid_login_params, pop_alert_not_joine
     pop_alert_disconnected, pop_alert_already_in_game
 from utils import validation
 
+# Class that manages whole app and shows Login Window
 class LoginWindow:
     def __init__(self, root):
         self.root = root
@@ -49,6 +50,7 @@ class LoginWindow:
         self.player_nickname = None
         self.lock = threading.Lock()
 
+    # Method for thread that check if connection is available
     def check_timeout(self):
         while not self.timer_stop_event.is_set():
             with self.lock:
@@ -68,6 +70,7 @@ class LoginWindow:
 
             time.sleep(2)
 
+    # Method for connecting to the server
     def connect_to_server(self):
         ip = self.server_ip_entry.get()
         port = int(self.server_port_entry.get())
@@ -101,10 +104,12 @@ class LoginWindow:
         except Exception as e:
             pop_alert_not_joined(self.root)
 
+    # Method that creates Login window
     def open_chat_window(self, server):
         self.lobby_window_initializer = LobbyWindow(self.root, server)
         self.lobby_window_initializer.open_chat_window()
 
+    # Method that handles messages from server
     def handle_server_response(self):
         while True:
             try:
@@ -126,9 +131,11 @@ class LoginWindow:
                 print(f"Error reading response from server, connection closed.")
                 break
 
+    # Method that calls method from child component to update lobbies
     def update_lobby_list(self, lobbies):
         self.lobby_window_initializer.update_lobby_list(lobbies)
 
+    # Method that handle messages
     def handle_message(self, message):
         self.last_message_time = time.time()
         if not self.is_server_available:
@@ -206,6 +213,7 @@ class LoginWindow:
         else:
             self.disconnect_from_server()
 
+    # Method that handle response from server
     def handle_response_from_server(self, response):
         print("Server response: ", response)
         response = response.replace("\n", "")
@@ -216,16 +224,19 @@ class LoginWindow:
             self.disconnect_from_server()
         pass
 
+    # Method that send pong message
     def send_pong(self):
         message = messageHandler.create_pong_message()
         self.server.sendall((message + "\n").encode())
 
+    # Method that update connection status in child components
     def update_children_state(self):
         if self.game_window_initializer is not None:
             self.game_window_initializer.update_connection_status(self.is_server_available)
         if self.lobby_window_initializer is not None:
             self.lobby_window_initializer.update_connection_status(self.is_server_available)
 
+    # Method that disconnect user from server and show login window with fulfilled params
     def disconnect_from_server(self):
         pop_alert_disconnected(self.root)
         self.lobby_window_initializer.chat_window.destroy()

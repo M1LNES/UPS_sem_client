@@ -1,5 +1,6 @@
-MAGIC = "vrata123"
+# File with message constants needed for identifying type of messages
 
+MAGIC = "vrata123"
 NICK_TYPE = "nick"
 MESSAGE_TYPE_LENGTH = 4
 MESSAGE_LENGTH_FORMAT = 3

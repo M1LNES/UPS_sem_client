@@ -1,5 +1,8 @@
 from constants import message_constants
 
+# This file is message "manager"
+# Format of the messages is created here
+# Also contain some methods for extracting or validating message
 
 def create_nick_message(nick):
     len_nick = str(len(nick)).zfill(3)
