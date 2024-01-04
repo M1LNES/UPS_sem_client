@@ -186,7 +186,14 @@ class GameWindow:
             self.game_gui_mounted = True
 
         players_info = f"{self._current_players}/{self._max_players}"
-        points_str = ", ".join(f"{nickname}: {self.points[nickname]}" for nickname in self.nicknames)
+        active_players = [f"{nickname}: {self.points[nickname]}" for nickname in self.nicknames if
+                          nickname not in self.pending_users]
+        pending_players = [f"[Lost Connection] {nickname}: {self.points[nickname]}" for nickname in
+                           self.pending_users]
+
+        all_players = active_players + pending_players
+        points_str = ", ".join(all_players)
+
         self.nicknames_label.config(text=f"Nicknames and Points: {points_str}")
         self.current_players_label.config(text=f"Current Players: {players_info}")
 
