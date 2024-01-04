@@ -411,7 +411,7 @@ class GameWindow:
             self.masked_sentence = segments[2]
             self.hint = segments[3]
             self.refresh_gui()
-            if segments[4] == 1:
+            if segments[4] == "1":
                 self.keyboard_frame.grid_forget()
         else:
             return None
