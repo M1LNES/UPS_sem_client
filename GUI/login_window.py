@@ -60,18 +60,7 @@ class LoginWindow:
                 else:
                     self.is_server_available = True
                 if elapsed_time >= 30:
-                    pop_alert_disconnected(self.root)
-                    self.lobby_window_initializer.chat_window.destroy()
-                    if self.game_window_initializer is not None:
-                        self.game_window_initializer.game_window.destroy()
-                    try:
-                        if self.server:
-                            self.server.close()
-                    except Exception as e:
-                        print(f"Error closing the socket: {e}")
-                    self.server = None
-                    self.root.deiconify()
-                    self.timer_stop_event.set()
+                    self.disconnect_from_server()
                     return
 
                 self.update_children_state()
@@ -189,6 +178,13 @@ class LoginWindow:
             self.game_window_initializer.retrieve_state(message_body)
         elif message_type == message_constants.ALREADY_IN_GAME:
             pop_alert_already_in_game(self.root)
+        elif message_type == message_constants.ERROR:
+            self.disconnect_from_server()
+        elif message_type == message_constants.INFO:
+            pass
+        else:
+            #zde to vymrdam
+            pass
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)
@@ -209,3 +205,17 @@ class LoginWindow:
             self.game_window_initializer.update_connection_status(self.is_server_available)
         if self.lobby_window_initializer is not None:
             self.lobby_window_initializer.update_connection_status(self.is_server_available)
+
+    def disconnect_from_server(self):
+        pop_alert_disconnected(self.root)
+        self.lobby_window_initializer.chat_window.destroy()
+        if self.game_window_initializer is not None:
+            self.game_window_initializer.game_window.destroy()
+        try:
+            if self.server:
+                self.server.close()
+        except Exception as e:
+            print(f"Error closing the socket: {e}")
+        self.server = None
+        self.root.deiconify()
+        self.timer_stop_event.set()

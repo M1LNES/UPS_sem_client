@@ -56,7 +56,7 @@ def pop_alert_not_joined(parent):
 def pop_alert_connection_lost(parent):
     info_message = (
         f"Lost connection with server! \n\n"
-        f"You have 60 seconds to join back - if your connection is not gonna be back in next 25 seconds,\n you will be"
+        f"You have 60 seconds to join back - if your connection is not gonna be back in next 25 seconds,\n you will be "
         f"disconnected, but still you have 30 seconds to join back with your name to retrieve state.\n"
     )
 
@@ -69,7 +69,7 @@ def pop_alert_connection_lost(parent):
 def pop_alert_disconnected(parent):
     info_message = (
         f"Closing connection! \n\n"
-        f"You were unavailable for 30 seconds. You still have 30 seconds to join back. \n"
+        f"You were disconnect from server.\n"
     )
 
     alert_window = tk.Toplevel(parent)
