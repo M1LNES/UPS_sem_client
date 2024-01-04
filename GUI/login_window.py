@@ -8,8 +8,9 @@ from tkinter import ttk
 from constants import message_constants
 from GUI.lobby_window import LobbyWindow
 from GUI.game_window import GameWindow
-from utils.validation import pop_alert_invalid_login_params, pop_alert_not_joined, pop_alert_connection_lost, pop_alert_disconnected, pop_alert_already_in_game
-
+from utils.validation import pop_alert_invalid_login_params, pop_alert_not_joined, pop_alert_connection_lost, \
+    pop_alert_disconnected, pop_alert_already_in_game
+from utils import validation
 
 class LoginWindow:
     def __init__(self, root):
@@ -122,7 +123,7 @@ class LoginWindow:
                     self.handle_response_from_server(msg)
 
             except Exception as e:
-                print(f"Error reading response from server: {str(e)}")
+                print(f"Error reading response from server, connection closed.")
                 break
 
     def update_lobby_list(self, lobbies):
@@ -139,10 +140,15 @@ class LoginWindow:
             message_constants.MAGIC) + message_constants.MESSAGE_LENGTH_FORMAT + message_constants.MESSAGE_TYPE_LENGTH]
         message_body = message[len(
             message_constants.MAGIC) + message_constants.MESSAGE_LENGTH_FORMAT + message_constants.MESSAGE_TYPE_LENGTH:]
+
         if message_type == message_constants.LOBBY_INFO_TYPE:
+            if not validation.validate_lobby_info_type(message_body):
+                self.disconnect_from_server()
             lobbies = messageHandler.extract_lobbies_info(message_body)
             self.update_lobby_list(lobbies)
         elif message_type == message_constants.LOBBY_JOIN_RESPONSE:
+            if not validation.validate_lobby_join_response(message_body):
+                self.disconnect_from_server()
             success = messageHandler.joined_lobby_successfully(message_body)
             if success:
                 self.lobby_window_initializer.close_lobby_window()
@@ -151,6 +157,9 @@ class LoginWindow:
                                                           self.is_server_available)
                 self.game_window_initializer.open_game_window()
         elif message_type == message_constants.CAN_GAME_START:
+            if not validation.validate_can_game_start(message_body):
+                self.disconnect_from_server()
+
             canBeStarted = messageHandler.can_game_begin(message_body)
             current_players, max_players = messageHandler.extract_players(message_body)
 
@@ -159,22 +168,34 @@ class LoginWindow:
             self.game_window_initializer.can_be_started = canBeStarted
 
         elif message_type == message_constants.GAME_STARTED_INIT:
+            if not validation.validate_game_started_init(message_body):
+                self.disconnect_from_server()
             self.game_window_initializer.extract_init_game_info(message_body)
         elif message_type == message_constants.SENTENCE_GUESSED:
+            if not validation.validate_setence_gussed(message_body):
+                self.disconnect_from_server()
             self.game_window_initializer.show_guessed_sentence(message_body)
         elif message_type == message_constants.GAME_ENDING:
+            if not validation.validate_game_ending(message_body):
+                self.disconnect_from_server()
             self.game_window_initializer.end_the_game(message_body)
         elif message_type == message_constants.PING:
             self.send_pong()
         elif message_type == message_constants.CANCEL:
             self.game_window_initializer.cancel_game()
         elif message_type == message_constants.PENDING_USER:
+            if not validation.validate_pending_user(message_body):
+                self.disconnect_from_server()
             self.game_window_initializer.update_pending_users(message_body)
         elif message_type == message_constants.CONNECTED_USER:
+            if not validation.validate_connected_user(message_body):
+                self.disconnect_from_server()
             self.game_window_initializer.remove_pending_user(message_body)
         elif message_type == message_constants.LETTER_SELECTED:
             self.game_window_initializer.keyboard_frame.grid_forget()
         elif message_type == message_constants.RETRIEVING_STATE:
+            if not validation.validate_retrieving_state(message_body):
+                self.disconnect_from_server()
             self.game_window_initializer.retrieve_state(message_body)
         elif message_type == message_constants.ALREADY_IN_GAME:
             pop_alert_already_in_game(self.root)
@@ -183,8 +204,7 @@ class LoginWindow:
         elif message_type == message_constants.INFO:
             pass
         else:
-            #zde to vymrdam
-            pass
+            self.disconnect_from_server()
 
     def handle_response_from_server(self, response):
         print("Server response: ", response)
@@ -193,7 +213,7 @@ class LoginWindow:
             with self.lock:
                 self.handle_message(response)
         else:
-            print("Not valid")
+            self.disconnect_from_server()
         pass
 
     def send_pong(self):

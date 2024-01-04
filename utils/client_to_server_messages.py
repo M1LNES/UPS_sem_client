@@ -69,7 +69,6 @@ def joined_lobby_successfully(message):
 
 
 def can_game_begin(message):
-    print("Zprava: ", message)
     return message[0] == "1"
 
 
