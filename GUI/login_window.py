@@ -215,7 +215,7 @@ class LoginWindow:
 
     # Method that handle response from server
     def handle_response_from_server(self, response):
-        print("Server response: ", response)
+        print("Server response: ", response.replace("\r", ""))
         response = response.replace("\n", "")
         if messageHandler.is_message_valid(response):
             with self.lock:
